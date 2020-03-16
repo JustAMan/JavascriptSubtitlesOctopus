@@ -304,7 +304,10 @@ EMCC_COMMON_ARGS = \
 	-s STRICT=1 \
 	-s FORCE_FILESYSTEM=1 \
 	--llvm-lto 1 \
-	-g1 \
+	-g \
+	-fsanitize=undefined \
+	-fsanitize=address \
+	-s SAFE_HEAP=1 \
 	-o $@
 	#--js-opts 0 -g4 \
 	#--closure 1 \

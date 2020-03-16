@@ -146,8 +146,8 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
             for (int x = 0; x < curw; x++)
             {
                 // manual bounds check
-                if (x + curx >= width) printf("libass: outside by x");
-                if (y + cury >= height) printf("libass: outside by y");
+                //if (x + curx >= width) printf("libass: outside by x");
+                //if (y + cury >= height) printf("libass: outside by y");
 
                 float pix_alpha = bitmap[bitmap_offset + x] * a / 255.0;
                 float inv_alpha = 1.0 - pix_alpha;

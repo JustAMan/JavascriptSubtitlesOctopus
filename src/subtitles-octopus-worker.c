@@ -190,6 +190,7 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
     }
     
     // return the thing
+    printf("libass: returning result");
     free(buf);
     *dest_x = min_x;
     *dest_y = min_y;

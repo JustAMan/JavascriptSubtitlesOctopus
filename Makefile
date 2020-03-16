@@ -4,7 +4,7 @@
 BASE_DIR:=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 DIST_DIR:=$(BASE_DIR)dist/libraries
 
-GLOBAL_CFLAGS:=-g -O3 -fsanitize=undefined -fsanitize=address
+GLOBAL_CFLAGS:=-g4 -O3 -fsanitize=undefined
 
 all: subtitleoctopus
 
@@ -26,7 +26,6 @@ dist/libraries/lib/libfribidi.a: lib/fribidi/configure
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
-		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -57,7 +56,6 @@ dist/libraries/lib/libexpat.a: lib/expat/expat/configured
 		-DCMAKE_C_FLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
-		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -110,7 +108,6 @@ lib/freetype/build_hb/dist_hb/lib/libfreetype.a: dist/libraries/lib/libbrotlidec
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
-		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -146,7 +143,6 @@ dist/libraries/lib/libharfbuzz.a: lib/freetype/build_hb/dist_hb/lib/libfreetype.
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
-		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -182,7 +178,6 @@ dist/libraries/lib/libfreetype.a: dist/libraries/lib/libharfbuzz.a dist/librarie
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
-		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -286,7 +281,7 @@ src/Makefile: dist/libraries/lib/libass.a
 	cd src && \
 	autoreconf -fi && \
 	EM_PKG_CONFIG_PATH=$(DIST_DIR)/lib/pkgconfig \
-	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS="$(GLOBAL_CFLAGS)"
+	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS="$(GLOBAL_CFLAGS) -s SAFE_HEAP=1"
 
 src/subtitles-octopus-worker.bc: src/Makefile src/subtitles-octopus-worker.c
 	cd src && \
@@ -305,6 +300,7 @@ EMCC_COMMON_ARGS = \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s STRICT=1 \
 	-s FORCE_FILESYSTEM=1 \
+	-s SAFE_HEAP=1 \
 	--llvm-lto 1 \
 	--no-heap-copy \
 	-o $@
@@ -321,6 +317,7 @@ dist/subtitles-octopus-worker.js: src/subtitles-octopus-worker.bc
 		--pre-js src/unbrotli.js \
 		--post-js src/post-worker.js \
 		-s WASM=1 \
+		--source-map-base http://localhost:8080/assets/js/ \
 		$(EMCC_COMMON_ARGS)
 
 dist/subtitles-octopus-worker-legacy.js: src/subtitles-octopus-worker.bc
@@ -330,9 +327,9 @@ dist/subtitles-octopus-worker-legacy.js: src/subtitles-octopus-worker.bc
 		--post-js src/post-worker.js \
 		-s WASM=0 \
 		-s LEGACY_VM_SUPPORT=1 \
-		$(EMCC_COMMON_ARGS)
+		$(EMCC_COMMON_ARGS) -g3
 
-dist/subtitles-octopus.js:
+dist/subtitles-octopus.js: src/subtitles-octopus.js
 	cp src/subtitles-octopus.js dist/
 
 # Clean Tasks

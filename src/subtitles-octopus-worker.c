@@ -113,15 +113,15 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
         printf("libass: error: cannot allocate buffer for blending");
         return NULL;
     }
-    unsigned char *result = (unsigned char*)malloc(sizeof(unsigned char) * width * height * 4);
+    /*unsigned char *result = (unsigned char*)malloc(sizeof(unsigned char) * width * height * 4);
     if (result == NULL)
     {
         printf("libass: error: cannot allocate result for blending");
         free(buf);
         return NULL;
-    }
+    }*/
     memset(buf, 0, sizeof(float) * width * height * 4);
-    memset(result, 0, sizeof(unsigned char) * width * height * 4);
+    //memset(result, 0, sizeof(unsigned char) * width * height * 4);
 
     // blend things in
     for (cur = img; cur != NULL; cur = cur->next)
@@ -170,17 +170,18 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
     }
     
     // now build the result
+    /*
     for (int y = 0, buf_line_coord = 0; y < height; y++, buf_line_coord += width)
     {
         for (int x = 0; x < width; x++)
         {
             int buf_coord = (buf_line_coord + x) << 2;
-            // need to un-multiply the result
             float alpha = buf[buf_coord + 3];
             if (alpha > 1e-5)
             {
                 for (int offset = 0; offset < 3; offset++)
                 {
+                    // need to un-multiply the result
                     float value = buf[buf_coord + offset] / alpha;
                     result[buf_coord + offset] = CLAMP_UINT8(value);
                 }
@@ -188,6 +189,7 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
             }
         }
     }
+    */
     
     // return the thing
     printf("libass: returning result");
@@ -196,7 +198,7 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
     *dest_y = min_y;
     *dest_width = width;
     *dest_height = height;
-    return result;
+    return NULL;//result;
 }
 
 int main(int argc, char *argv[])

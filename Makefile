@@ -25,7 +25,7 @@ dist/libraries/lib/libfribidi.a: lib/fribidi/configure
 	emconfigure ./configure \
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
@@ -56,7 +56,7 @@ dist/libraries/lib/libexpat.a: lib/expat/expat/configured
 	emconfigure cmake \
 		-DCMAKE_C_FLAGS=" \
 		-s USE_PTHREADS=0 \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
@@ -86,7 +86,7 @@ dist/libraries/lib/libbrotlidec.a: lib/brotli/configured
 	cd lib/brotli/build && \
 	emconfigure cmake \
 		-DCMAKE_C_FLAGS=" \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		" \
 		-DCMAKE_INSTALL_PREFIX=$(DIST_DIR) \
 		.. \
@@ -109,7 +109,7 @@ lib/freetype/build_hb/dist_hb/lib/libfreetype.a: dist/libraries/lib/libbrotlidec
 	emconfigure ../configure \
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
@@ -145,7 +145,7 @@ dist/libraries/lib/libharfbuzz.a: lib/freetype/build_hb/dist_hb/lib/libfreetype.
 	emconfigure ./configure \
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
@@ -181,7 +181,7 @@ dist/libraries/lib/libfreetype.a: dist/libraries/lib/libharfbuzz.a dist/librarie
 	emconfigure ./configure \
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
@@ -219,7 +219,7 @@ dist/libraries/lib/libfontconfig.a: dist/libraries/lib/libharfbuzz.a dist/librar
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		-DEMSCRIPTEN \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_EXIT_RUNTIME=1 \
 		--llvm-lto 1 \
 		-s STRICT=1 \
@@ -252,7 +252,7 @@ dist/libraries/lib/libass.a: dist/libraries/lib/libfontconfig.a dist/libraries/l
 	emconfigure ./configure \
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
-		$GLOBAL_CFLAGS \
+		$(GLOBAL_CFLAGS) \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -286,7 +286,7 @@ src/Makefile: dist/libraries/lib/libass.a
 	cd src && \
 	autoreconf -fi && \
 	EM_PKG_CONFIG_PATH=$(DIST_DIR)/lib/pkgconfig \
-	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS="$GLOBAL_CFLAGS"
+	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS="$(GLOBAL_CFLAGS)"
 
 src/subtitles-octopus-worker.bc: src/Makefile src/subtitles-octopus-worker.c
 	cd src && \
@@ -295,7 +295,7 @@ src/subtitles-octopus-worker.bc: src/Makefile src/subtitles-octopus-worker.c
 
 # Dist Files
 EMCC_COMMON_ARGS = \
-	$GLOBAL_CFLAGS \
+	$(GLOBAL_CFLAGS) \
 	-s EXPORTED_FUNCTIONS="['_main', '_malloc', '_libassjs_init', '_libassjs_quit', '_libassjs_resize', '_libassjs_render', '_libassjs_free_track', '_libassjs_create_track', '_libassjs_render_blend', '_free']" \
 	-s EXTRA_EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'getValue', 'FS_createPreloadedFile', 'FS_createFolder']" \
 	-s NO_EXIT_RUNTIME=1 \

@@ -128,7 +128,7 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
     {
         int curw = cur->w, curh = cur->h;
         if (curw == 0 || curh == 0) continue; // skip empty images
-        int curs = cur->stride >= curw : cur->stride : curw, curx = cur->dst_x, cury = cur->dst_y;
+        int curs = (cur->stride >= curw) ? cur->stride : curw, curx = cur->dst_x, cury = cur->dst_y;
         
         unsigned char *bitmap = cur->bitmap;
         float a = (cur->color & 0xFF) / 255.0;

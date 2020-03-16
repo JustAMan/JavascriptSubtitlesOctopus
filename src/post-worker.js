@@ -202,7 +202,7 @@ self.blendRender = function (force) {
         var blendW = Module.getValue(self.blendW, 'i32');
         var blendH = Module.getValue(self.blendH, 'i32');
         // make a copy, as we should free the memory so subsequent calls can utilize it
-        var result = new HEAPU8.slice(renderResult, renderResult + blendW * blendH * 4);
+        var result = HEAPU8.slice(renderResult, renderResult + blendW * blendH * 4);
         Module._free(renderResult);
         var spentTime = performance.now() - startTime;
 

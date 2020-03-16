@@ -307,7 +307,6 @@ EMCC_COMMON_ARGS = \
 	-g \
 	-fsanitize=undefined \
 	-fsanitize=address \
-	-s SAFE_HEAP=1 \
 	-o $@
 	#--js-opts 0 -g4 \
 	#--closure 1 \

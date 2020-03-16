@@ -287,7 +287,7 @@ src/Makefile:
 src/subtitles-octopus-worker.bc: dist/libraries/lib/libass.a src/Makefile
 	cd src && \
 	EM_PKG_CONFIG_PATH=$(DIST_DIR)/lib/pkgconfig \
-	emconfigure ./configure --host=x86-none-linux --build=x86_64 && \
+	CFLAGS='-g -O3' emconfigure ./configure --host=x86-none-linux --build=x86_64 && \
 	emmake make -j8 && \
 	mv subtitlesoctopus subtitles-octopus-worker.bc
 
@@ -306,7 +306,8 @@ EMCC_COMMON_ARGS = \
 	--llvm-lto 1 \
 	-g \
 	-fsanitize=undefined \
-	-fsanitize=address \
+	-s SAFE_HEAP = 1 \
+	--no-heap-copy \
 	-o $@
 	#--js-opts 0 -g4 \
 	#--closure 1 \

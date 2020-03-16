@@ -217,7 +217,7 @@ self.blendRender = function (force) {
     }
 
     if (!self._isPaused) {
-        self.rafId = self.requestAnimationFrame(self.render);
+        self.rafId = self.requestAnimationFrame(self.blendRender);
     }
 };
 

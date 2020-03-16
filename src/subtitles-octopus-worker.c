@@ -128,7 +128,7 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
     {
         int curw = cur->w, curh = cur->h;
         if (curw == 0 || curh == 0) continue; // skip empty images
-        int curs = cur->stride, curx = cur->dst_x, cury = cur->dst_y;
+        int curs = cur->stride >= curw : cur->stride : curw, curx = cur->dst_x, cury = cur->dst_y;
         
         unsigned char *bitmap = cur->bitmap;
         float a = (cur->color & 0xFF) / 255.0;
@@ -145,6 +145,10 @@ void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int 
             int buf_line_coord = (cury + y) * width;
             for (int x = 0; x < curw; x++)
             {
+                // manual bounds check
+                if (x + curx >= width) printf("libass: outside by x=%d (dst_x=%d, width=%d)", x, curx, width);
+                if (y + cury >= height) printf("libass: outside by y=%d (dst_y=%d, height=%d)", y, cury, height);
+
                 float pix_alpha = bitmap[bitmap_offset + x] * a / 255.0;
                 float inv_alpha = 1.0 - pix_alpha;
                 

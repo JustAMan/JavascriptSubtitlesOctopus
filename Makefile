@@ -280,14 +280,14 @@ OCTP_DEPS = \
 	$(DIST_DIR)/lib/libfontconfig.a \
 	$(DIST_DIR)/lib/libass.a
 
-src/Makefile:
+src/Makefile: dist/libraries/lib/libass.a
 	cd src && \
-	autoreconf -fi
-
-src/subtitles-octopus-worker.bc: dist/libraries/lib/libass.a src/Makefile
-	cd src && \
+	autoreconf -fi && \
 	EM_PKG_CONFIG_PATH=$(DIST_DIR)/lib/pkgconfig \
-	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS='-g -O3 -fsanitize=undefined -s SAFE_HEAP=1'  && \
+	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS='-g -O3 -fsanitize=undefined -s SAFE_HEAP=1'
+
+src/subtitles-octopus-worker.bc: src/Makefile src/subtitles-octopus-worker.c
+	cd src && \
 	emmake make -j8 && \
 	mv subtitlesoctopus subtitles-octopus-worker.bc
 

@@ -534,7 +534,6 @@ function onMessageFromMainEmscriptenThread(message) {
             self.subContent = message.data.subContent;
             self.fontFiles = message.data.fonts;
             self.renderMode = message.data.renderMode;
-            //self.fastRenderMode = message.data.fastRender;
             self.availableFonts = message.data.availableFonts;
             self.debug = message.data.debug;
             if (!hasNativeConsole && self.debug) {

@@ -316,7 +316,6 @@ dist/subtitles-octopus-worker.js: src/subtitles-octopus-worker.bc src/pre-worker
 		--pre-js src/unbrotli.js \
 		--post-js src/post-worker.js \
 		-s WASM=1 \
-		--source-map-base http://localhost:8080/assets/js/ \
 		$(EMCC_COMMON_ARGS)
 
 dist/subtitles-octopus-worker-legacy.js: src/subtitles-octopus-worker.bc src/pre-worker.js src/unbrotli.js src/post-worker.js

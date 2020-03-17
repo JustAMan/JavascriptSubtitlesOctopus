@@ -80,7 +80,10 @@ ASS_Image * libassjs_render(double tm, int *changed)
     return img;
 }
 
-#define CLAMP_UINT8(value) ((value > 0) ? ((value < (256./255.)) ? (int)(value * 255) : 255) : 0)
+const float MIN_UINT8_CAST = 0.9 / 255;
+const float MAX_UINT8_CAST = 256.0 / 255;
+
+#define CLAMP_UINT8(value) ((value > MIN_UINT8_CAST) ? ((value < MAX_UINT8_CAST) ? (int)(value * 255) : 255) : 0)
 
 void* libassjs_render_blend(double tm, int force, int dbg_min_img, int dbg_max_img, 
         int *dest_x, int *dest_y, int *dest_width, int *dest_height)
@@ -124,56 +127,29 @@ void* libassjs_render_blend(double tm, int force, int dbg_min_img, int dbg_max_i
     memset(buf, 0, sizeof(float) * width * height * 4);
     memset(result, 0, sizeof(unsigned char) * width * height * 4);
 
-    // test coordinates on screen // hack
-            int tx = 181 + 70;
-            int ty = 29;
-
     // blend things in
-    int img_index = 0;
     for (cur = img; cur != NULL; cur = cur->next)
     {
         int curw = cur->w, curh = cur->h;
         if (curw == 0 || curh == 0) continue; // skip empty images
-
-        if (img_index < dbg_min_img || img_index > dbg_max_img)
-        {
-            img_index++;
-            continue; //hack
-        }
-        img_index++;
+        int a = (255 - (cur->color & 0xFF));
+        if (a == 0) continue; // skip transparent images
 
         int curs = (cur->stride >= curw) ? cur->stride : curw;
         int curx = cur->dst_x - min_x, cury = cur->dst_y - min_y;
-        
-        { //hack
-            int imgx = tx - cur->dst_x, imgy = ty - cur->dst_y;
-            if (imgx >= 0 && imgx < cur->w && imgy >= 0 && imgy < cur->h)
-            {
-                printf("DEBUG: img[x=%d,y=%d]=%d, color=%d\n",
-                    imgx, imgy, cur->bitmap[imgy * cur->stride + imgx], cur->color);
-            }
-        }
-        
-        unsigned char *bitmap = cur->bitmap;
-        //float a = (255 - (cur->color & 0xFF)) / 255.0;
-        float a = (cur->color & 0xFF) / 255.0;
 
-        // premultiply by alpha
+        unsigned char *bitmap = cur->bitmap;
+        float normalized_a = a / 255.0;
         float r = ((cur->color >> 24) & 0xFF) / 255.0;
         float g = ((cur->color >> 16) & 0xFF) / 255.0;
         float b = ((cur->color >> 8) & 0xFF) / 255.0;
-        /*
-        float r = a * ((cur->color >> 24) & 0xFF) / 255.0;
-        float g = a * ((cur->color >> 16) & 0xFF) / 255.0;
-        float b = a * ((cur->color >> 8) & 0xFF) / 255.0;
-        */
 
         int buf_line_coord = cury * width;
         for (int y = 0, bitmap_offset = 0; y < curh; y++, bitmap_offset += curs, buf_line_coord += width)
         {
             for (int x = 0; x < curw; x++)
             {
-                float pix_alpha = bitmap[bitmap_offset + x] * a / 255.0;
+                float pix_alpha = bitmap[bitmap_offset + x] * normalized_a / 255.0;
                 float inv_alpha = 1.0 - pix_alpha;
                 
                 int buf_coord = (buf_line_coord + curx + x) << 2;
@@ -182,64 +158,33 @@ void* libassjs_render_blend(double tm, int force, int dbg_min_img, int dbg_max_i
                 float *buf_b = buf + buf_coord + 2;
                 float *buf_a = buf + buf_coord + 3;
                 
-                if (buf_coord + 3 >= width * height * 4)
-                {
-                    // WTF?!
-                    printf("something bad happened: %d=(%d + %d + %d) << 2 | (%d * %d)\n",
-                        buf_coord, buf_line_coord, curx, x, width, height);
-                    continue;
-                    //abort();
-                }
-                
-                float buf_alpha = *buf_a;
-                
-                // do the compositing
-                *buf_a = pix_alpha + buf_alpha * inv_alpha;
-                *buf_r = r + *buf_r * inv_alpha;
-                *buf_g = g + *buf_g * inv_alpha;
-                *buf_b = b + *buf_b * inv_alpha;
+                // do the compositing, pre-multiply image RGB with alpha for current pixel
+                *buf_a = pix_alpha + *buf_a * inv_alpha;
+                *buf_r = r * pix_alpha + *buf_r * inv_alpha;
+                *buf_g = g * pix_alpha + *buf_g * inv_alpha;
+                *buf_b = b * pix_alpha + *buf_b * inv_alpha;
             }
         }
     }
     
     // now build the result
-    int shown = 0;
-    const float min_alpha = 0.9 / 255;
     for (int y = 0, buf_line_coord = 0; y < height; y++, buf_line_coord += width)
     {
         for (int x = 0; x < width; x++)
         {
             int buf_coord = (buf_line_coord + x) << 2;
             float alpha = buf[buf_coord + 3];
-            if (alpha > min_alpha)
+            if (alpha > MIN_UINT8_CAST)
             {
                 for (int offset = 0; offset < 3; offset++)
                 {
                     // need to un-multiply the result
-                    float value = buf[buf_coord + offset];// / alpha;
+                    float value = buf[buf_coord + offset] / alpha;
                     result[buf_coord + offset] = CLAMP_UINT8(value);
                 }
                 result[buf_coord + 3] = CLAMP_UINT8(alpha);
-                if (alpha > 0.5 && buf[buf_coord] > 0.5 && !shown)
-                {
-                    printf("updating %d:%d (off=%d <- [%d * 4]) <%d %d %d %d>\n",
-                        x, y, buf_coord, buf_line_coord,
-                        result[buf_coord], result[buf_coord+1], result[buf_coord+2], result[buf_coord+3]);
-                    printf("original: <%f %f %f %f>\n",
-                        buf[buf_coord], buf[buf_coord+1], buf[buf_coord+2], buf[buf_coord+3]);
-                    shown = 1;
-                }
             }
         }
-    }
-    // hack
-    {
-        int bufx = tx - min_x, bufy = ty - min_y;
-        int offset = (bufy * width + bufx) * 4;
-        printf("DEBUG: after blending 1 image (floats): (%f, %f, %f, %f)\n",
-            buf[offset], buf[offset+1], buf[offset+2], buf[offset+3]);
-        printf("DEBUG: after blending 1 image (result): (%d, %d, %d, %d)\n",
-            result[offset], result[offset+1], result[offset+2], result[offset+3]);
     }
     
     // return the thing

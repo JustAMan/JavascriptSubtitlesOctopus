@@ -195,6 +195,7 @@ self.blendRender = function (force) {
     var startTime = performance.now();
 
     var renderResult = self._render_blend(self.getCurrentTime() + self.delay, force ? 1 : 0,
+                                          0, 0, /* min_index : max_index */
                                           self.blendX, self.blendY, self.blendW, self.blendH);
     if (renderResult) {
         var blendX = Module.getValue(self.blendX, 'i32');

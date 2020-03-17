@@ -98,7 +98,7 @@ Module['onRuntimeInitialized'] = function () {
     self._free_track = Module['cwrap']('libassjs_free_track', null, null);
     self._create_track = Module['cwrap']('libassjs_create_track', null, ['string']);
 
-    self._render_blend = Module['cwrap']('libassjs_render_blend', null, ['number', 'number', 'number', 'number', 'number', 'number']);
+    self._render_blend = Module['cwrap']('libassjs_render_blend', null, ['number','number','number', 'number', 'number', 'number', 'number', 'number']);
 
     self.quit = Module['cwrap']('libassjs_quit', null, []);
     self.changed = Module._malloc(4);

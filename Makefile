@@ -4,7 +4,7 @@
 BASE_DIR:=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 DIST_DIR:=$(BASE_DIR)dist/libraries
 
-GLOBAL_CFLAGS:=-g4 -O3 -fsanitize=undefined
+GLOBAL_CFLAGS:=-O3
 
 all: subtitleoctopus
 
@@ -281,7 +281,7 @@ src/Makefile: dist/libraries/lib/libass.a
 	cd src && \
 	autoreconf -fi && \
 	EM_PKG_CONFIG_PATH=$(DIST_DIR)/lib/pkgconfig \
-	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS="$(GLOBAL_CFLAGS) -s SAFE_HEAP=1"
+	emconfigure ./configure --host=x86-none-linux --build=x86_64 CFLAGS="$(GLOBAL_CFLAGS)"
 
 src/subtitles-octopus-worker.bc: src/Makefile src/subtitles-octopus-worker.c
 	cd src && \
@@ -300,7 +300,6 @@ EMCC_COMMON_ARGS = \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s STRICT=1 \
 	-s FORCE_FILESYSTEM=1 \
-	-s SAFE_HEAP=1 \
 	--llvm-lto 1 \
 	--no-heap-copy \
 	-o $@
@@ -327,7 +326,7 @@ dist/subtitles-octopus-worker-legacy.js: src/subtitles-octopus-worker.bc
 		--post-js src/post-worker.js \
 		-s WASM=0 \
 		-s LEGACY_VM_SUPPORT=1 \
-		$(EMCC_COMMON_ARGS) -g3
+		$(EMCC_COMMON_ARGS)
 
 dist/subtitles-octopus.js: src/subtitles-octopus.js
 	cp src/subtitles-octopus.js dist/

@@ -310,7 +310,7 @@ EMCC_COMMON_ARGS = \
 
 dist: src/subtitles-octopus-worker.bc dist/subtitles-octopus-worker.js dist/subtitles-octopus-worker-legacy.js dist/subtitles-octopus.js
 
-dist/subtitles-octopus-worker.js: src/subtitles-octopus-worker.bc
+dist/subtitles-octopus-worker.js: src/subtitles-octopus-worker.bc src/pre-worker.js src/unbrotli.js src/post-worker.js
 	emcc src/subtitles-octopus-worker.bc $(OCTP_DEPS) \
 		--pre-js src/pre-worker.js \
 		--pre-js src/unbrotli.js \
@@ -319,7 +319,7 @@ dist/subtitles-octopus-worker.js: src/subtitles-octopus-worker.bc
 		--source-map-base http://localhost:8080/assets/js/ \
 		$(EMCC_COMMON_ARGS)
 
-dist/subtitles-octopus-worker-legacy.js: src/subtitles-octopus-worker.bc
+dist/subtitles-octopus-worker-legacy.js: src/subtitles-octopus-worker.bc src/pre-worker.js src/unbrotli.js src/post-worker.js
 	emcc src/subtitles-octopus-worker.bc $(OCTP_DEPS) \
 		--pre-js src/pre-worker.js \
 		--pre-js src/unbrotli.js \

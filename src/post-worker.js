@@ -209,7 +209,6 @@ self.blendRender = function (force) {
             // make a copy, as we should free the memory so subsequent calls can utilize it
             var result = new Uint8Array(HEAPU8.subarray(renderResult, renderResult + blendW * blendH * 4));
             Module._free(renderResult);
-            var spentTime = performance.now() - startTime;
 
             canvases = [{w: blendW, h: blendH, x: blendX, y: blendY, buffer: result.buffer}];
             buffers = [result.buffer];
@@ -220,7 +219,7 @@ self.blendRender = function (force) {
             target: 'canvas',
             op: 'renderCanvas',
             time: Date.now(),
-            spentTime: spentTime,
+            spentTime: performance.now() - startTime,
             blendTime: blendTime,
             canvases: canvases
         }, buffers);

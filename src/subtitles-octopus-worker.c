@@ -85,8 +85,7 @@ const float MAX_UINT8_CAST = 256.0 / 255;
 
 #define CLAMP_UINT8(value) ((value > MIN_UINT8_CAST) ? ((value < MAX_UINT8_CAST) ? (int)(value * 255) : 255) : 0)
 
-void* libassjs_render_blend(double tm, int force, int dbg_min_img, int dbg_max_img, 
-        int *dest_x, int *dest_y, int *dest_width, int *dest_height)
+void* libassjs_render_blend(double tm, int force, int *dest_x, int *dest_y, int *dest_width, int *dest_height)
 {
     int changed;
     ASS_Image *img = ass_render_frame(ass_renderer, track, (int)(tm * 1000), &changed);

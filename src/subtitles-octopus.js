@@ -236,26 +236,7 @@ var SubtitlesOctopus = function (options) {
     function renderFrames() {
         var data = self.renderFramesData;
         var beforeDrawTime = performance.now();
-        self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
-        // hack
-        /*if (data.canvases.length > 0) {
-            for (var i = 0; i < data.canvases.length; i++) {
-                (function (idx) {
-                    var img = data.canvases[idx];
-                    var buf = new Uint8ClampedArray(img.buffer);
-                    for (var t = 0; t < buf.length; t++) {
-                        if (buf[t] > 10) {
-                            console.log("non-black element found at offset=" + t + ", img=(" + img.x + ',' + img.y + ':' + img.w + ',' + img.h + ")");
-                            return;
-                        }
-                    }
-                }(i));
-            }
-        }*/
-        var dbg_min_index = 0, dbg_max_index = 0;
         for (var i = 0; i < data.canvases.length; i++) {
-            if (i < dbg_min_index || i > dbg_max_index) continue; //hack
-
             var image = data.canvases[i];
             self.bufferCanvas.width = image.w;
             self.bufferCanvas.height = image.h;

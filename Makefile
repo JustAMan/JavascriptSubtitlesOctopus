@@ -26,6 +26,7 @@ dist/libraries/lib/libfribidi.a: lib/fribidi/configure
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
+		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -56,6 +57,7 @@ dist/libraries/lib/libexpat.a: lib/expat/expat/configured
 		-DCMAKE_C_FLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
+		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -85,6 +87,7 @@ dist/libraries/lib/libbrotlidec.a: lib/brotli/configured
 	emconfigure cmake \
 		-DCMAKE_C_FLAGS=" \
 		$(GLOBAL_CFLAGS) \
+		-s NO_FILESYSTEM=1 \
 		" \
 		-DCMAKE_INSTALL_PREFIX=$(DIST_DIR) \
 		.. \
@@ -108,6 +111,7 @@ lib/freetype/build_hb/dist_hb/lib/libfreetype.a: dist/libraries/lib/libbrotlidec
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
+		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -143,6 +147,7 @@ dist/libraries/lib/libharfbuzz.a: lib/freetype/build_hb/dist_hb/lib/libfreetype.
 		CFLAGS=" \
 		-s USE_PTHREADS=0 \
 		$(GLOBAL_CFLAGS) \
+		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		-s STRICT=1 \
 		--llvm-lto 1 \
@@ -215,6 +220,7 @@ dist/libraries/lib/libfontconfig.a: dist/libraries/lib/libharfbuzz.a dist/librar
 		-s USE_PTHREADS=0 \
 		-DEMSCRIPTEN \
 		$(GLOBAL_CFLAGS) \
+		-s NO_FILESYSTEM=1 \
 		-s NO_EXIT_RUNTIME=1 \
 		--llvm-lto 1 \
 		-s STRICT=1 \

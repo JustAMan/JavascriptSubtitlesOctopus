@@ -2284,9 +2284,13 @@ function abort(what) {
 }
 
 var dataURIPrefix = "data:application/octet-stream;base64,";
+var fileURIPrefix = "file://";
 
 function isDataURI(filename) {
  return String.prototype.startsWith ? filename.startsWith(dataURIPrefix) : filename.indexOf(dataURIPrefix) === 0;
+}
+function isFileURI(filename) {
+ return String.prototype.startsWith ? filename.startsWith(fileURIPrefix) : filename.indexOf(fileURIPrefix) === 0;
 }
 
 var wasmBinaryFile = "subtitles-octopus-worker.wasm";
@@ -2311,7 +2315,7 @@ function getBinary() {
 }
 
 function getBinaryPromise() {
- if (!wasmBinary && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) && typeof fetch === "function") {
+ if (!wasmBinary && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) && typeof fetch === "function" && !isFileURI(wasmBinaryFile)) {
   return fetch(wasmBinaryFile, {
    credentials: "same-origin"
   }).then(function(response) {
@@ -2351,7 +2355,9 @@ function createWasm() {
   });
  }
  function instantiateAsync() {
-  if (!wasmBinary && typeof WebAssembly.instantiateStreaming === "function" && !isDataURI(wasmBinaryFile) && typeof fetch === "function") {
+     console.log('wasm file:', wasmBinaryFile);
+     console.log('fetch:', fetch);
+  if (!wasmBinary && typeof WebAssembly.instantiateStreaming === "function" && !isDataURI(wasmBinaryFile) && !isFileURI(wasmBinaryFile) && typeof fetch === "function") {
    fetch(wasmBinaryFile, {
     credentials: "same-origin"
    }).then(function(response) {

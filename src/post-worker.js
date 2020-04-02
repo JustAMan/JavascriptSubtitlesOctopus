@@ -79,6 +79,7 @@ self.getRenderMethod = function () {
  * @param {!string} content the content of the subtitle file.
  */
 self.setTrack = function (content) {
+    console.log("setTrack called, contents:", content.substring(0, 100));
     // Make sure that the fonts are loaded
     self.writeAvailableFontsToFS(content);
 

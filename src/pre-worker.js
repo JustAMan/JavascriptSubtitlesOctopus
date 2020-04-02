@@ -53,9 +53,16 @@ Module["preRun"].push(function () {
     if (!self.subContent) {
         // We can use sync xhr cause we're inside Web Worker
         if (self.subUrl.endsWith(".br")) {
+            console.log("loading subContent from brotli url", self.subUrl);
             self.subContent = Module["BrotliDecode"](readBinary(self.subUrl))
         } else {
+            console.log("loading subConent from url", self.subUrl);
             self.subContent = read_(self.subUrl);
+        }
+        if (self.subContent) {
+            console.log("content gathered", self.subContent.substring(0, 100));
+        } else {
+            console.log("NO CONTENTS! WTF?");
         }
     }
 
@@ -94,8 +101,10 @@ Module['onRuntimeInitialized'] = function () {
 
     self.changed = Module._malloc(4);
 
+    self.octObj.setLogLevel(6); // verbose logging
     self.octObj.initLibrary(screen.width, screen.height);
     self.octObj.setDropAnimations(!!self.dropAllAnimations);
+    console.log("trying to create a track in onRuntimeInitialized");
     self.octObj.createTrack("/sub.ass");
     self.ass_track = self.octObj.track;
     self.ass_library = self.octObj.ass_library;
